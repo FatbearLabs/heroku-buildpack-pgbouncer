@@ -90,7 +90,7 @@ do
 EOFEOF
 
   cat >> "$CONFIG_DIR/pgbouncer.ini" << EOFEOF
-$CLIENT_DB_NAME= host=$DB_HOST dbname=$DB_NAME port=$DB_PORT
+$CLIENT_DB_NAME= host=$DB_HOST dbname=$DB_NAME port=$DB_PORT ${PGBOUNCER_CONNECT_QUERY:+connect_query="'${PGBOUNCER_CONNECT_QUERY//\'/\'\'}'"}
 EOFEOF
 
   (( n += 1 ))
