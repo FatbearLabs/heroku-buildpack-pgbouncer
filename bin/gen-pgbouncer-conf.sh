@@ -19,8 +19,7 @@ cat >> "$CONFIG_DIR/pgbouncer.ini" << EOFEOF
 [pgbouncer]
 listen_addr = 127.0.0.1
 listen_port = 6000
-auth_type = md5
-auth_file = $CONFIG_DIR/users.txt
+auth_type = any
 server_tls_sslmode = require
 pool_mode = ${POOL_MODE}
 server_reset_query = ${SERVER_RESET_QUERY}
@@ -66,25 +65,20 @@ do
     fi
   done
 
-  DB_MD5_PASS="md5"$(echo -n "${DB_PASS}""${DB_USER}" | md5sum | awk '{print $1}')
-
+  CLIENT_USER="user"  # auth_type is "any" since we connect to pgbouncer locally, so this is just a placeholder
   CLIENT_DB_NAME="db${n}"
 
   echo "Setting ${POSTGRES_URL}_PGBOUNCER config var"
 
   if [ "$PGBOUNCER_PREPARED_STATEMENTS" == "false" ]
   then
-    export "${POSTGRES_URL}"_PGBOUNCER=postgres://"$DB_USER":"$DB_PASS"@127.0.0.1:6000/$CLIENT_DB_NAME?prepared_statements=false
+    export "${POSTGRES_URL}"_PGBOUNCER=postgres://"$DB_USER"@127.0.0.1:6000/$CLIENT_DB_NAME?prepared_statements=false
   else
-    export "${POSTGRES_URL}"_PGBOUNCER=postgres://"$DB_USER":"$DB_PASS"@127.0.0.1:6000/$CLIENT_DB_NAME
+    export "${POSTGRES_URL}"_PGBOUNCER=postgres://"$DB_USER"@127.0.0.1:6000/$CLIENT_DB_NAME
   fi
 
-  cat >> "$CONFIG_DIR/users.txt" << EOFEOF
-"$DB_USER" "$DB_MD5_PASS"
-EOFEOF
-
   cat >> "$CONFIG_DIR/pgbouncer.ini" << EOFEOF
-$CLIENT_DB_NAME= host=$DB_HOST dbname=$DB_NAME port=$DB_PORT ${PGBOUNCER_CONNECT_QUERY:+connect_query="'${PGBOUNCER_CONNECT_QUERY//\'/\'\'}'"}
+${CLIENT_DB_NAME}= host=${DB_HOST} dbname=${DB_NAME} port=${DB_PORT} user=${DB_USER} password=${DB_PASS} ${PGBOUNCER_CONNECT_QUERY:+connect_query="'${PGBOUNCER_CONNECT_QUERY//\'/\'\'}'"}
 EOFEOF
 
   (( n += 1 ))
