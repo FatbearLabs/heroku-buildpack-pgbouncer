@@ -21,14 +21,7 @@ listen_addr = 127.0.0.1
 listen_port = 6000
 auth_type = md5
 auth_file = $CONFIG_DIR/users.txt
-server_tls_sslmode = prefer
-server_tls_protocols = secure
-server_tls_ciphers = HIGH:!ADH:!AECDH:!LOW:!EXP:!MD5:!3DES:!SRP:!PSK:@STRENGTH
-
-; When server connection is released back to pool:
-;   session      - after client disconnects
-;   transaction  - after transaction finishes
-;   statement    - after statement finishes
+server_tls_sslmode = require
 pool_mode = ${POOL_MODE}
 server_reset_query = ${SERVER_RESET_QUERY}
 max_client_conn = ${PGBOUNCER_MAX_CLIENT_CONN:-100}
@@ -44,6 +37,7 @@ log_pooler_errors = ${PGBOUNCER_LOG_POOLER_ERRORS:-1}
 stats_period = ${PGBOUNCER_STATS_PERIOD:-60}
 ignore_startup_parameters = ${PGBOUNCER_IGNORE_STARTUP_PARAMETERS}
 query_wait_timeout = ${PGBOUNCER_QUERY_WAIT_TIMEOUT:-120}
+${PGBOUNCER_MAX_PREPARED_STATEMENTS:+max_prepared_statements = ${PGBOUNCER_MAX_PREPARED_STATEMENTS}}
 
 [databases]
 EOFEOF

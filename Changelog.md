@@ -1,4 +1,6 @@
 ## Unreleased
+* Update pgbouncer to v1.21.0 with support for prepared_statements in transaction pool_mode
+* Drop support for Heroku-18
 * Converted our remaining CircleCI tests to Github Actions
 * Add validation for PGBOUNCER_URLS
 * Add stack tests
